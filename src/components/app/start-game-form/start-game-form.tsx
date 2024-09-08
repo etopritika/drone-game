@@ -15,8 +15,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { getTokenChunk, initGame } from "./actions";
 import { usePlayerStore } from "@/store/player-store";
-import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
+import { LoaderCircle } from "lucide-react";
 
 const StartGameSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -30,8 +30,6 @@ const StartGameForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
-  const [tokenChunk, setTokenChunk] = React.useState<string[]>([]);
-  const progressValue = (tokenChunk.length / 4) * 100;
 
   const setPlayerId = usePlayerStore((state) => state.setPlayerId);
   const setName = usePlayerStore((state) => state.setName);
@@ -49,7 +47,6 @@ const StartGameForm = () => {
   const onSubmit: SubmitHandler<z.infer<typeof StartGameSchema>> = async (
     data
   ) => {
-    setTokenChunk([]);
     setLoading(true);
 
     try {
@@ -59,24 +56,18 @@ const StartGameForm = () => {
       setComplexity(data.complexity);
       setPlayerId(res.id);
 
-      const chunk1 = await getTokenChunk(res.id, 1);
-      setTokenChunk((prev) => [...prev, chunk1.chunk]);
+      const chunkPromises = [
+        getTokenChunk(res.id, 1),
+        getTokenChunk(res.id, 2),
+        getTokenChunk(res.id, 3),
+        getTokenChunk(res.id, 4),
+      ];
 
-      const chunk2 = await getTokenChunk(res.id, 2);
-      setTokenChunk((prev) => [...prev, chunk2.chunk]);
+      const chunks = await Promise.all(chunkPromises);
 
-      const chunk3 = await getTokenChunk(res.id, 3);
-      setTokenChunk((prev) => [...prev, chunk3.chunk]);
+      const chunkValues = chunks.map((chunk) => chunk.chunk);
 
-      const chunk4 = await getTokenChunk(res.id, 4);
-      setTokenChunk((prev) => [...prev, chunk4.chunk]);
-
-      const fullChunks = [
-        chunk1.chunk,
-        chunk2.chunk,
-        chunk3.chunk,
-        chunk4.chunk,
-      ].join("");
+      const fullChunks = chunkValues.join("");
       addChunk(fullChunks);
 
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -148,7 +139,7 @@ const StartGameForm = () => {
 
         <div className="flex justify-between">
           <Button disabled={loading} type="submit">
-            Lets role!
+            {loading ? <LoaderCircle className="animate-spin" /> : "Lets role!"}
           </Button>
           <Button
             variant="outline"
@@ -158,7 +149,6 @@ const StartGameForm = () => {
             Reset
           </Button>
         </div>
-        {loading && <Progress value={progressValue} />}
       </form>
     </Form>
   );
