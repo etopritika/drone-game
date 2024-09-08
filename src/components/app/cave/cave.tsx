@@ -48,11 +48,7 @@ const Cave: React.FC<CaveProps> = ({ segments }) => {
 
   const canvasHeight = segments.length * 20 - 20;
 
-  return (
-    <div className="min-h-screen">
-      <canvas ref={canvasRef} width="500" height={canvasHeight} />
-    </div>
-  );
+  return <canvas ref={canvasRef} width="500" height={canvasHeight} />;
 };
 
 export default Cave;
