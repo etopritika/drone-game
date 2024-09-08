@@ -1,5 +1,6 @@
 import CaveLoadingProgress from "@/components/app/cave-loading-progress/cave-loading-progress";
 import Cave from "@/components/app/cave/cave";
+import Drone from "@/components/app/drone/drone";
 import { useWebSocket } from "@/hooks/use-web-socket";
 import { usePlayerStore } from "@/store/player-store";
 import { useCallback, useState } from "react";
@@ -27,11 +28,21 @@ const GamePage = () => {
   useWebSocket(playerId, token, handleMessage);
 
   return (
-    <div>
+    <div className="relative min-h-screen">
       {!allCoordinatesReceived && (
-        <CaveLoadingProgress allCoordinatesReceived={allCoordinatesReceived} />
+        <div className="h-screen flex items-center">
+          <CaveLoadingProgress
+            allCoordinatesReceived={allCoordinatesReceived}
+          />
+        </div>
       )}
-      {allCoordinatesReceived && <Cave segments={caveSegments} />}
+
+      {allCoordinatesReceived && (
+        <div>
+          <Drone />
+          <Cave segments={caveSegments} />
+        </div>
+      )}
     </div>
   );
 };
