@@ -1,21 +1,24 @@
 import CaveLoadingProgress from "@/components/app/cave-loading-progress/cave-loading-progress";
 import Cave from "@/components/app/cave/cave";
-import Drone from "@/components/app/drone/drone";
+// import Drone from "@/components/app/drone/drone";
+import GameDrawer from "@/components/app/game-drawer/game-drawer";
 import { useWebSocket } from "@/hooks/use-web-socket";
 import { usePlayerStore } from "@/store/player-store";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const GamePage = () => {
   const playerId = usePlayerStore((state) => state.playerId);
   const chunks = usePlayerStore((state) => state.chunks);
   const token = chunks;
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+
   const [caveSegments, setCaveSegments] = useState<
     { leftWall: number; rightWall: number }[]
   >([]);
   const [allCoordinatesReceived, setAllCoordinatesReceived] = useState(false);
 
-  const handleMessage = useCallback((data: string) => {
+  const handleReceiveCoordinates = useCallback((data: string) => {
     if (data === "finished") {
       setAllCoordinatesReceived(true);
       return;
@@ -25,7 +28,29 @@ const GamePage = () => {
     setCaveSegments((prev) => [...prev, { leftWall, rightWall }]);
   }, []);
 
-  useWebSocket(playerId, token, handleMessage);
+  useWebSocket(playerId, token, handleReceiveCoordinates);
+
+  const handleShowDrawer = useCallback((event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setIsDrawerOpen((prev) => !prev);
+    }
+
+    if (event.code === "Space") {
+      setIsDrawerOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleShowDrawer);
+
+    return () => {
+      window.removeEventListener("keydown", handleShowDrawer);
+    };
+  }, [handleShowDrawer]);
+
+  const handleCloseDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
 
   return (
     <div className="relative min-h-screen">
@@ -39,8 +64,13 @@ const GamePage = () => {
 
       {allCoordinatesReceived && (
         <div>
-          <Drone />
-          <Cave segments={caveSegments} />
+          <GameDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
+          {/* <Drone /> */}
+          <Cave
+            segments={caveSegments}
+            allCoordinatesReceived={allCoordinatesReceived}
+            isDrawerOpen={isDrawerOpen}
+          />
         </div>
       )}
     </div>
