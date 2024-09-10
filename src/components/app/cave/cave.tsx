@@ -1,11 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Drone from "../drone/drone";
 
 interface CaveProps {
   segments: { leftWall: number; rightWall: number }[];
+  allCoordinatesReceived: boolean;
+  isDrawerOpen: boolean;
 }
 
-const Cave: React.FC<CaveProps> = ({ segments }) => {
+const Cave: React.FC<CaveProps> = ({
+  segments,
+  allCoordinatesReceived,
+  isDrawerOpen,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [caveOffsetY, setCaveOffsetY] = useState(0);
+  const verticalSpeed = 20;
+
+  useEffect(() => {
+    if (allCoordinatesReceived && !isDrawerOpen) {
+      const interval = setInterval(() => {
+        setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
+      }, 100);
+
+      return () => clearInterval(interval);
+    }
+  }, [allCoordinatesReceived, isDrawerOpen]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,7 +39,7 @@ const Cave: React.FC<CaveProps> = ({ segments }) => {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "#242424";
+    ctx.fillStyle = "#242424"; // Фон печери
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     segments.forEach(({ leftWall, rightWall }) => {
@@ -33,10 +52,10 @@ const Cave: React.FC<CaveProps> = ({ segments }) => {
       ctx.lineTo(lastRightX, lastY);
       ctx.closePath();
 
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = "#FFFFFF"; // Колір стін
       ctx.fill();
 
-      ctx.strokeStyle = "#FFFFFF";
+      ctx.strokeStyle = "#FFFFFF"; // Колір контуру стін
       ctx.lineWidth = 2;
       ctx.stroke();
 
@@ -48,7 +67,17 @@ const Cave: React.FC<CaveProps> = ({ segments }) => {
 
   const canvasHeight = segments.length * 20 - 20;
 
-  return <canvas ref={canvasRef} width="500" height={canvasHeight} />;
+  return (
+    <div className="relative overflow-hidden h-screen w-full">
+      <Drone />
+      <canvas
+        ref={canvasRef}
+        width="500"
+        height={canvasHeight}
+        style={{ transform: `translateY(${-caveOffsetY}px)` }}
+      />
+    </div>
+  );
 };
 
 export default Cave;
