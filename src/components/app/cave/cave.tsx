@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Drone from "../drone/drone";
 
 interface CaveProps {
@@ -14,17 +14,34 @@ const Cave: React.FC<CaveProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [caveOffsetY, setCaveOffsetY] = useState(0);
-  const verticalSpeed = 20;
+  const [verticalSpeed, setVerticalSpeed] = useState(10);
+  const segmentHeight = 20;
+  const canvasHeight = segments.length * segmentHeight;
+
+  const handleSpeedUp = useCallback(() => {
+    setVerticalSpeed((prev) => Math.min(prev + 2, 50));
+  }, []);
+
+  const handleSpeedDown = useCallback(() => {
+    setVerticalSpeed((prev) => Math.max(prev - 2, 1));
+  }, []);
 
   useEffect(() => {
-    if (allCoordinatesReceived && !isDrawerOpen) {
-      const interval = setInterval(() => {
-        setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
-      }, 100);
+    let animationFrameId: number;
 
-      return () => clearInterval(interval);
+    const animate = () => {
+      setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    if (allCoordinatesReceived && !isDrawerOpen) {
+      animationFrameId = requestAnimationFrame(animate);
     }
-  }, [allCoordinatesReceived, isDrawerOpen]);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [allCoordinatesReceived, isDrawerOpen, verticalSpeed]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -32,14 +49,13 @@ const Cave: React.FC<CaveProps> = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let lastLeftX = 250;
-    let lastRightX = 250;
-    let lastY = -21;
-    const segmentHeight = 20;
+    let lastLeftX = 250 + (segments[0]?.leftWall ?? -71);
+    let lastRightX = 250 + (segments[0]?.rightWall ?? 71);
+    let lastY = 0;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = "#242424"; // Фон печери
+    ctx.fillStyle = "#242424";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     segments.forEach(({ leftWall, rightWall }) => {
@@ -52,10 +68,10 @@ const Cave: React.FC<CaveProps> = ({
       ctx.lineTo(lastRightX, lastY);
       ctx.closePath();
 
-      ctx.fillStyle = "#FFFFFF"; // Колір стін
+      ctx.fillStyle = "#FFFFFF";
       ctx.fill();
 
-      ctx.strokeStyle = "#FFFFFF"; // Колір контуру стін
+      ctx.strokeStyle = "#FFFFFF";
       ctx.lineWidth = 2;
       ctx.stroke();
 
@@ -65,11 +81,14 @@ const Cave: React.FC<CaveProps> = ({
     });
   }, [segments]);
 
-  const canvasHeight = segments.length * 20 - 20;
-
   return (
     <div className="relative overflow-hidden h-screen w-full">
-      <Drone />
+      <Drone
+        segments={segments}
+        caveOffsetY={caveOffsetY}
+        handleSpeedUp={handleSpeedUp}
+        handleSpeedDown={handleSpeedDown}
+      />
       <canvas
         ref={canvasRef}
         width="500"

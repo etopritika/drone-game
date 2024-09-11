@@ -1,16 +1,40 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-const Drone: React.FC = () => {
+interface DroneProps {
+  segments: { leftWall: number; rightWall: number }[];
+  caveOffsetY: number;
+  handleSpeedUp: () => void;
+  handleSpeedDown: () => void;
+}
+
+const Drone: React.FC<DroneProps> = ({
+  segments,
+  caveOffsetY,
+  handleSpeedUp,
+  handleSpeedDown,
+}) => {
   const [droneX, setDroneX] = useState(250);
   const canvasWidth = 500;
-  const moveStep = 5;
+  const moveStep = 2;
+  const segmentHeight = 20;
   const keysPressed = useRef<{ [key: string]: boolean }>({});
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      keysPressed.current[event.key] = true;
-    }
-  };
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        keysPressed.current[event.key] = true;
+      }
+
+      if (event.key === "ArrowDown") {
+        handleSpeedUp();
+      }
+
+      if (event.key === "ArrowUp") {
+        handleSpeedDown();
+      }
+    },
+    [handleSpeedUp, handleSpeedDown]
+  );
 
   const handleKeyUp = (event: KeyboardEvent) => {
     if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -45,7 +69,23 @@ const Drone: React.FC = () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [handleKeyDown]);
+
+  useEffect(() => {
+    const currentSegmentIndex = Math.floor(caveOffsetY / segmentHeight);
+
+    if (segments[currentSegmentIndex]) {
+      const { leftWall, rightWall } = segments[currentSegmentIndex];
+      const leftWallX = 250 + leftWall;
+      const rightWallX = 250 + rightWall;
+
+      if (droneX >= leftWallX && droneX <= rightWallX) {
+        console.log("Дрон знаходиться в безпечній зоні.");
+      } else {
+        console.log("Дрон врізався у стіну або вийшов за межі печери!");
+      }
+    }
+  }, [droneX, caveOffsetY, segments]);
 
   return (
     <div
