@@ -55,17 +55,25 @@ const StartGameForm = () => {
     },
   });
 
-  const savePlayerToLocalStorage = (name: string, complexity: number) => {
+  const savePlayerToLocalStorage = (name: string) => {
     const storedPlayers = localStorage.getItem("players");
     const players = storedPlayers ? JSON.parse(storedPlayers) : [];
 
-    const newPlayer = {
+    const playerIndex = players.findIndex(
+      (player: { name: string }) => player.name === name
+    );
+
+    const newPlayerData = {
       name: name,
-      complexity: complexity,
-      score: 0,
+      complexity: 0,
+      topScore: 0,
     };
 
-    players.push(newPlayer);
+    if (playerIndex !== -1) {
+      players[playerIndex] = { ...players[playerIndex] };
+    } else {
+      players.push(newPlayerData);
+    }
 
     localStorage.setItem("players", JSON.stringify(players));
   };
@@ -82,7 +90,7 @@ const StartGameForm = () => {
       setComplexity(data.complexity);
       setPlayerId(res.id);
 
-      savePlayerToLocalStorage(data.name, data.complexity);
+      savePlayerToLocalStorage(data.name);
 
       const chunkPromises = [
         getTokenChunk(res.id, 1),
@@ -97,8 +105,6 @@ const StartGameForm = () => {
 
       const fullChunks = chunkValues.join("");
       addChunk(fullChunks);
-
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       navigate("/game");
     } catch (error) {

@@ -10,13 +10,17 @@ const GamePage = () => {
   const complexity = usePlayerStore((state) => state.complexity);
   const chunks = usePlayerStore((state) => state.chunks);
   const token = chunks;
+  const savedCaveSegments = usePlayerStore((state) => state.caveSegments); // Завантажуємо збережені сегменти
+  const setCaveSegmentsStore = usePlayerStore((state) => state.setCaveSegments);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   const [caveSegments, setCaveSegments] = useState<
     { leftWall: number; rightWall: number }[]
-  >([]);
-  const [allCoordinatesReceived, setAllCoordinatesReceived] = useState(false);
+  >(savedCaveSegments || []);
+  const [allCoordinatesReceived, setAllCoordinatesReceived] = useState(
+    !!savedCaveSegments.length
+  );
 
   const handleReceiveCoordinates = useCallback((data: string) => {
     if (data === "finished") {
@@ -51,6 +55,12 @@ const GamePage = () => {
   const handleCloseDrawer = useCallback(() => {
     setIsDrawerOpen(false);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setCaveSegmentsStore(caveSegments);
+    };
+  }, [caveSegments, setCaveSegmentsStore]);
 
   return (
     <div className="relative min-h-screen">
