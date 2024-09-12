@@ -2,6 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Drone from "../drone/drone";
 import Score from "../score/score";
 import { usePlayerStore } from "@/store/player-store";
+import {
+  CAVE_MAX_SPEED,
+  CAVE_MIN_SPEED,
+  CAVE_SPEED,
+  CAVE_SPEED_MULTIPLIER,
+  SEGMENT_HEIGHT,
+} from "@/lib/game-settings";
 
 interface CaveProps {
   segments: { leftWall: number; rightWall: number }[];
@@ -18,18 +25,21 @@ const Cave: React.FC<CaveProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [caveOffsetY, setCaveOffsetY] = useState(0);
-  const [verticalSpeed, setVerticalSpeed] = useState(5);
-  const segmentHeight = 20;
-  const canvasHeight = segments.length * segmentHeight;
+  const [verticalSpeed, setVerticalSpeed] = useState(CAVE_SPEED);
+  const canvasHeight = segments.length * SEGMENT_HEIGHT;
 
   const isGameOver = usePlayerStore((state) => state.isGameOver);
 
   const handleSpeedUp = useCallback(() => {
-    setVerticalSpeed((prev) => Math.min(prev + 2, 50));
+    setVerticalSpeed((prev) =>
+      Math.min(prev + CAVE_SPEED_MULTIPLIER, CAVE_MAX_SPEED)
+    );
   }, []);
 
   const handleSpeedDown = useCallback(() => {
-    setVerticalSpeed((prev) => Math.max(prev - 2, 1));
+    setVerticalSpeed((prev) =>
+      Math.max(prev - CAVE_SPEED_MULTIPLIER, CAVE_MIN_SPEED)
+    );
   }, []);
 
   useEffect(() => {
@@ -67,7 +77,7 @@ const Cave: React.FC<CaveProps> = ({
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     segments.forEach(({ leftWall, rightWall }) => {
-      const currentY = lastY + segmentHeight;
+      const currentY = lastY + SEGMENT_HEIGHT;
 
       ctx.beginPath();
       ctx.moveTo(lastLeftX, lastY);

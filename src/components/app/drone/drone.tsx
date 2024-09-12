@@ -1,3 +1,4 @@
+import { DRONE_HORIZONTAL_SPEED, SEGMENT_HEIGHT } from "@/lib/game-settings";
 import { usePlayerStore } from "@/store/player-store";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,8 +20,6 @@ const Drone: React.FC<DroneProps> = ({
   const [droneX, setDroneX] = useState(250);
   const [droneOpacity, setDroneOpacity] = useState(1);
   const canvasWidth = 500;
-  const moveStep = 5;
-  const segmentHeight = 20;
   const keysPressed = useRef<{ [key: string]: boolean }>({});
 
   const isGameOver = usePlayerStore((state) => state.isGameOver);
@@ -56,10 +55,10 @@ const Drone: React.FC<DroneProps> = ({
           let newX = prevX;
 
           if (keysPressed.current["ArrowLeft"]) {
-            newX = Math.max(0, prevX - moveStep);
+            newX = Math.max(0, prevX - DRONE_HORIZONTAL_SPEED);
           }
           if (keysPressed.current["ArrowRight"]) {
-            newX = Math.min(canvasWidth - 20, prevX + moveStep);
+            newX = Math.min(canvasWidth - 20, prevX + DRONE_HORIZONTAL_SPEED);
           }
 
           return newX;
@@ -83,7 +82,7 @@ const Drone: React.FC<DroneProps> = ({
   }, [handleKeyDown, isGameOver]);
 
   useEffect(() => {
-    const currentSegmentIndex = Math.floor(caveOffsetY / segmentHeight);
+    const currentSegmentIndex = Math.floor(caveOffsetY / SEGMENT_HEIGHT);
 
     if (currentSegmentIndex >= segments.length) {
       setGameOver(true);
