@@ -10,7 +10,7 @@ const GamePage = () => {
   const complexity = usePlayerStore((state) => state.complexity);
   const chunks = usePlayerStore((state) => state.chunks);
   const token = chunks;
-  const savedCaveSegments = usePlayerStore((state) => state.caveSegments); // Завантажуємо збережені сегменти
+  const savedCaveSegments = usePlayerStore((state) => state.caveSegments);
   const setCaveSegmentsStore = usePlayerStore((state) => state.setCaveSegments);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
