@@ -1,5 +1,8 @@
+import { usePlayerStore } from "@/store/player-store";
+
 const FinishGame = () => {
-  return <>Finish Game</>;
+  const score = usePlayerStore((state) => state.score);
+  return <>Finish Game: {score}</>;
 };
 
 export default FinishGame;

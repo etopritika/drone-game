@@ -13,23 +13,16 @@ export const useWebSocket = (
 
     const socket = new WebSocket(`${import.meta.env.VITE_BACKEND_URL}/cave`);
 
-    // Відправляємо ідентифікатор гравця та токен після відкриття з'єднання
     socket.onopen = function () {
-      console.log("Connection established");
-
-      // Формуємо повідомлення player:[id]-[token]
       const playerMessage = `player:${playerId}-${token}`;
-      socket.send(playerMessage); // Відправляємо дані гравця
+      socket.send(playerMessage);
       console.log(`Connection established: ${playerMessage}`);
     };
 
-    // Обробка отриманих повідомлень
     socket.onmessage = function (event) {
-      console.log(`Message received: ${event.data}`);
-      onMessage(event.data); // Викликаємо callback для обробки повідомлення
+      onMessage(event.data);
     };
 
-    // Обробка закриття з'єднання
     socket.onclose = function (event) {
       if (event.wasClean) {
         console.log(
@@ -40,12 +33,10 @@ export const useWebSocket = (
       }
     };
 
-    // Обробка помилок
     socket.onerror = function (event) {
       console.error("WebSocket error:", event);
     };
 
-    // Закриття WebSocket при демонтажі компонента
     return () => {
       socket.close();
     };

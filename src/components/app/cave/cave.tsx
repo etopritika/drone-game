@@ -1,11 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Drone from "../drone/drone";
+import Score from "../score/score";
 
 interface CaveProps {
   segments: { leftWall: number; rightWall: number }[];
+  allCoordinatesReceived: boolean;
+  isDrawerOpen: boolean;
+  complexity: number;
 }
 
-const Cave: React.FC<CaveProps> = ({ segments }) => {
+const Cave: React.FC<CaveProps> = ({
+  segments,
+  allCoordinatesReceived,
+  isDrawerOpen,
+  complexity,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [caveOffsetY, setCaveOffsetY] = useState(0);
+  const [verticalSpeed, setVerticalSpeed] = useState(5);
+  const segmentHeight = 20;
+  const canvasHeight = segments.length * segmentHeight;
+
+  const handleSpeedUp = useCallback(() => {
+    setVerticalSpeed((prev) => Math.min(prev + 2, 50));
+  }, []);
+
+  const handleSpeedDown = useCallback(() => {
+    setVerticalSpeed((prev) => Math.max(prev - 2, 1));
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const animate = () => {
+      setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    if (allCoordinatesReceived && !isDrawerOpen) {
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [allCoordinatesReceived, isDrawerOpen, verticalSpeed]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -13,10 +52,9 @@ const Cave: React.FC<CaveProps> = ({ segments }) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let lastLeftX = 250;
-    let lastRightX = 250;
-    let lastY = -21;
-    const segmentHeight = 20;
+    let lastLeftX = 250 + (segments[0]?.leftWall ?? -71);
+    let lastRightX = 250 + (segments[0]?.rightWall ?? 71);
+    let lastY = 0;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -46,9 +84,27 @@ const Cave: React.FC<CaveProps> = ({ segments }) => {
     });
   }, [segments]);
 
-  const canvasHeight = segments.length * 20 - 20;
-
-  return <canvas ref={canvasRef} width="500" height={canvasHeight} />;
+  return (
+    <div className="relative overflow-hidden h-screen w-full">
+      <Score
+        complexity={complexity}
+        verticalSpeed={verticalSpeed}
+        isDrawerOpen={isDrawerOpen}
+      />
+      <Drone
+        segments={segments}
+        caveOffsetY={caveOffsetY}
+        handleSpeedUp={handleSpeedUp}
+        handleSpeedDown={handleSpeedDown}
+      />
+      <canvas
+        ref={canvasRef}
+        width="500"
+        height={canvasHeight}
+        style={{ transform: `translateY(${-caveOffsetY}px)` }}
+      />
+    </div>
+  );
 };
 
 export default Cave;
