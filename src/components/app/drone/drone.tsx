@@ -17,11 +17,13 @@ const Drone: React.FC<DroneProps> = ({
 }) => {
   const navigate = useNavigate();
   const [droneX, setDroneX] = useState(250);
+  const [droneOpacity, setDroneOpacity] = useState(1);
   const canvasWidth = 500;
   const moveStep = 5;
   const segmentHeight = 20;
   const keysPressed = useRef<{ [key: string]: boolean }>({});
 
+  const isGameOver = usePlayerStore((state) => state.isGameOver);
   const setGameOver = usePlayerStore((state) => state.setGameOver);
 
   const handleKeyDown = useCallback(
@@ -49,23 +51,27 @@ const Drone: React.FC<DroneProps> = ({
 
   useEffect(() => {
     const moveDrone = () => {
-      setDroneX((prevX) => {
-        let newX = prevX;
+      if (!isGameOver) {
+        setDroneX((prevX) => {
+          let newX = prevX;
 
-        if (keysPressed.current["ArrowLeft"]) {
-          newX = Math.max(0, prevX - moveStep);
-        }
-        if (keysPressed.current["ArrowRight"]) {
-          newX = Math.min(canvasWidth - 20, prevX + moveStep);
-        }
+          if (keysPressed.current["ArrowLeft"]) {
+            newX = Math.max(0, prevX - moveStep);
+          }
+          if (keysPressed.current["ArrowRight"]) {
+            newX = Math.min(canvasWidth - 20, prevX + moveStep);
+          }
 
-        return newX;
-      });
+          return newX;
+        });
 
-      requestAnimationFrame(moveDrone);
+        requestAnimationFrame(moveDrone);
+      }
     };
 
-    requestAnimationFrame(moveDrone);
+    if (!isGameOver) {
+      requestAnimationFrame(moveDrone);
+    }
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
@@ -74,15 +80,17 @@ const Drone: React.FC<DroneProps> = ({
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [handleKeyDown]);
+  }, [handleKeyDown, isGameOver]);
 
   useEffect(() => {
     const currentSegmentIndex = Math.floor(caveOffsetY / segmentHeight);
 
     if (currentSegmentIndex >= segments.length) {
-      console.log("Вітаємо! Ви завершили гру.");
       setGameOver(true);
-      navigate("/finish-game");
+      setDroneOpacity(0);
+      setTimeout(() => {
+        navigate("/finish-game");
+      }, 2000);
       return;
     }
 
@@ -94,9 +102,11 @@ const Drone: React.FC<DroneProps> = ({
       if (droneX >= leftWallX && droneX <= rightWallX) {
         console.log("Дрон знаходиться в безпечній зоні.");
       } else {
-        console.log("Дрон врізався у стіну або вийшов за межі печери!");
         setGameOver(true);
-        navigate("/finish-game");
+        setDroneOpacity(0);
+        setTimeout(() => {
+          navigate("/finish-game");
+        }, 2000);
       }
     }
   }, [droneX, caveOffsetY, segments, setGameOver, navigate]);
@@ -104,7 +114,11 @@ const Drone: React.FC<DroneProps> = ({
   return (
     <div
       className="fixed top-0 bg-green-500 w-6 h-6 z-50"
-      style={{ transform: `translateX(${droneX}px)` }}
+      style={{
+        transform: `translateX(${droneX}px)`,
+        opacity: droneOpacity,
+        transition: "opacity 2s ease",
+      }}
     />
   );
 };

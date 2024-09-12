@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Drone from "../drone/drone";
 import Score from "../score/score";
+import { usePlayerStore } from "@/store/player-store";
 
 interface CaveProps {
   segments: { leftWall: number; rightWall: number }[];
@@ -21,6 +22,8 @@ const Cave: React.FC<CaveProps> = ({
   const segmentHeight = 20;
   const canvasHeight = segments.length * segmentHeight;
 
+  const isGameOver = usePlayerStore((state) => state.isGameOver);
+
   const handleSpeedUp = useCallback(() => {
     setVerticalSpeed((prev) => Math.min(prev + 2, 50));
   }, []);
@@ -33,18 +36,20 @@ const Cave: React.FC<CaveProps> = ({
     let animationFrameId: number;
 
     const animate = () => {
-      setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
-      animationFrameId = requestAnimationFrame(animate);
+      if (!isGameOver) {
+        setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
-    if (allCoordinatesReceived && !isDrawerOpen) {
+    if (allCoordinatesReceived && !isDrawerOpen && !isGameOver) {
       animationFrameId = requestAnimationFrame(animate);
     }
 
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [allCoordinatesReceived, isDrawerOpen, verticalSpeed]);
+  }, [allCoordinatesReceived, isDrawerOpen, verticalSpeed, isGameOver]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
