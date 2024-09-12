@@ -1,4 +1,6 @@
+import { usePlayerStore } from "@/store/player-store";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface DroneProps {
   segments: { leftWall: number; rightWall: number }[];
@@ -13,11 +15,14 @@ const Drone: React.FC<DroneProps> = ({
   handleSpeedUp,
   handleSpeedDown,
 }) => {
+  const navigate = useNavigate();
   const [droneX, setDroneX] = useState(250);
   const canvasWidth = 500;
-  const moveStep = 2;
+  const moveStep = 5;
   const segmentHeight = 20;
   const keysPressed = useRef<{ [key: string]: boolean }>({});
+
+  const setGameOver = usePlayerStore((state) => state.setGameOver);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -74,6 +79,13 @@ const Drone: React.FC<DroneProps> = ({
   useEffect(() => {
     const currentSegmentIndex = Math.floor(caveOffsetY / segmentHeight);
 
+    if (currentSegmentIndex >= segments.length) {
+      console.log("Вітаємо! Ви завершили гру.");
+      setGameOver(true);
+      navigate("/finish-game");
+      return;
+    }
+
     if (segments[currentSegmentIndex]) {
       const { leftWall, rightWall } = segments[currentSegmentIndex];
       const leftWallX = 250 + leftWall;
@@ -83,9 +95,11 @@ const Drone: React.FC<DroneProps> = ({
         console.log("Дрон знаходиться в безпечній зоні.");
       } else {
         console.log("Дрон врізався у стіну або вийшов за межі печери!");
+        setGameOver(true);
+        navigate("/finish-game");
       }
     }
-  }, [droneX, caveOffsetY, segments]);
+  }, [droneX, caveOffsetY, segments, setGameOver, navigate]);
 
   return (
     <div

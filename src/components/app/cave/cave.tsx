@@ -1,20 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Drone from "../drone/drone";
+import Score from "../score/score";
 
 interface CaveProps {
   segments: { leftWall: number; rightWall: number }[];
   allCoordinatesReceived: boolean;
   isDrawerOpen: boolean;
+  complexity: number;
 }
 
 const Cave: React.FC<CaveProps> = ({
   segments,
   allCoordinatesReceived,
   isDrawerOpen,
+  complexity,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [caveOffsetY, setCaveOffsetY] = useState(0);
-  const [verticalSpeed, setVerticalSpeed] = useState(10);
+  const [verticalSpeed, setVerticalSpeed] = useState(5);
   const segmentHeight = 20;
   const canvasHeight = segments.length * segmentHeight;
 
@@ -83,6 +86,11 @@ const Cave: React.FC<CaveProps> = ({
 
   return (
     <div className="relative overflow-hidden h-screen w-full">
+      <Score
+        complexity={complexity}
+        verticalSpeed={verticalSpeed}
+        isDrawerOpen={isDrawerOpen}
+      />
       <Drone
         segments={segments}
         caveOffsetY={caveOffsetY}

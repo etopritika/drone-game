@@ -1,6 +1,5 @@
 import CaveLoadingProgress from "@/components/app/cave-loading-progress/cave-loading-progress";
 import Cave from "@/components/app/cave/cave";
-// import Drone from "@/components/app/drone/drone";
 import GameDrawer from "@/components/app/game-drawer/game-drawer";
 import { useWebSocket } from "@/hooks/use-web-socket";
 import { usePlayerStore } from "@/store/player-store";
@@ -8,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 
 const GamePage = () => {
   const playerId = usePlayerStore((state) => state.playerId);
+  const complexity = usePlayerStore((state) => state.complexity);
   const chunks = usePlayerStore((state) => state.chunks);
   const token = chunks;
 
@@ -65,11 +65,11 @@ const GamePage = () => {
       {allCoordinatesReceived && (
         <div>
           <GameDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
-          {/* <Drone /> */}
           <Cave
             segments={caveSegments}
             allCoordinatesReceived={allCoordinatesReceived}
             isDrawerOpen={isDrawerOpen}
+            complexity={complexity}
           />
         </div>
       )}
