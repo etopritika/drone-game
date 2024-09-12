@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { getTokenChunk, initGame } from "./actions";
@@ -29,20 +29,46 @@ const StartGameSchema = z.object({
 const StartGameForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const setPlayerId = usePlayerStore((state) => state.setPlayerId);
   const setName = usePlayerStore((state) => state.setName);
   const setComplexity = usePlayerStore((state) => state.setComplexity);
   const addChunk = usePlayerStore((state) => state.addChunk);
 
+  const getLastPlayer = () => {
+    const storedPlayers = localStorage.getItem("players");
+    const players = storedPlayers ? JSON.parse(storedPlayers) : [];
+    return players.length > 0
+      ? players[players.length - 1]
+      : { name: "", complexity: 1 };
+  };
+
+  const lastPlayer = getLastPlayer();
+
   const form = useForm<z.infer<typeof StartGameSchema>>({
     resolver: zodResolver(StartGameSchema),
     defaultValues: {
-      name: "",
-      complexity: 1,
+      name: lastPlayer.name || "",
+      complexity: lastPlayer.complexity || 1,
     },
   });
+
+  const savePlayerToLocalStorage = (name: string, complexity: number) => {
+    const storedPlayers = localStorage.getItem("players");
+    const players = storedPlayers ? JSON.parse(storedPlayers) : [];
+
+    const newPlayer = {
+      name: name,
+      complexity: complexity,
+      score: 0,
+    };
+
+    players.push(newPlayer);
+
+    localStorage.setItem("players", JSON.stringify(players));
+  };
 
   const onSubmit: SubmitHandler<z.infer<typeof StartGameSchema>> = async (
     data
@@ -55,6 +81,8 @@ const StartGameForm = () => {
       setName(data.name);
       setComplexity(data.complexity);
       setPlayerId(res.id);
+
+      savePlayerToLocalStorage(data.name, data.complexity);
 
       const chunkPromises = [
         getTokenChunk(res.id, 1),
@@ -104,6 +132,11 @@ const StartGameForm = () => {
                   type="text"
                   placeholder="John"
                   {...field}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  className={`${
+                    field.value && !isFocused ? "bg-gray-200" : "bg-white"
+                  }`}
                 />
               </FormControl>
               <FormMessage />
