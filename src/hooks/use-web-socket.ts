@@ -12,7 +12,7 @@ export const useWebSocket = (
       return;
     }
 
-    const socket = new WebSocket("wss://cave-drone-server.shtoa.xyz/cave");
+    const socket = new WebSocket(`${import.meta.env.VITE_BACKEND_URL}/cave`);
 
     socket.onopen = function () {
       console.log("WebSocket opened successfully.");
