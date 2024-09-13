@@ -10,13 +10,16 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import TopScore from "@/components/app/top-score/top-score";
+import { useGameStore } from "@/store/game-store";
+import { useCaveStore } from "@/store/cave-store";
 
 const FinishGame = () => {
   const name = usePlayerStore((state) => state.name);
   const complexity = usePlayerStore((state) => state.complexity);
-  const score = usePlayerStore((state) => state.score);
-  const setGameOver = usePlayerStore((state) => state.setGameOver);
-  const setCaveSegments = usePlayerStore((state) => state.setCaveSegments);
+  const score = useGameStore((state) => state.score);
+  const setGameOver = useGameStore((state) => state.setGameOver);
+  const clearSegments = useCaveStore((state) => state.clearSegments);
+  const clearCave = useCaveStore((state) => state.clearCave);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +49,8 @@ const FinishGame = () => {
 
   const handleExit = () => {
     setGameOver(false);
-    setCaveSegments([]);
+    clearSegments();
+    clearCave();
     navigate("/start-game");
   };
 

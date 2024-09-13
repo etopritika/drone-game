@@ -2,6 +2,7 @@ import CaveLoadingProgress from "@/components/app/cave-loading-progress/cave-loa
 import Cave from "@/components/app/cave/cave";
 import GameDrawer from "@/components/app/game-drawer/game-drawer";
 import { useWebSocket } from "@/hooks/use-web-socket";
+import { useCaveStore } from "@/store/cave-store";
 import { usePlayerStore } from "@/store/player-store";
 import { useCallback, useEffect, useState } from "react";
 
@@ -10,28 +11,27 @@ const GamePage = () => {
   const complexity = usePlayerStore((state) => state.complexity);
   const chunks = usePlayerStore((state) => state.chunks);
   const token = chunks;
-  const savedCaveSegments = usePlayerStore((state) => state.caveSegments);
-  const setCaveSegmentsStore = usePlayerStore((state) => state.setCaveSegments);
-  const hasSavedSegments = savedCaveSegments.length > 0;
-
+  const cave = useCaveStore((state) => state.cave);
+  const addSegment = useCaveStore((state) => state.addSegment);
+  const finalizeCave = useCaveStore((state) => state.finalizeCave);
+  const hasCave = cave.length > 0;
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
-  const [caveSegments, setCaveSegments] = useState<
-    { leftWall: number; rightWall: number }[]
-  >(() => savedCaveSegments || []);
+  const [allCoordinatesReceived, setAllCoordinatesReceived] = useState(hasCave);
 
-  const [allCoordinatesReceived, setAllCoordinatesReceived] =
-    useState(hasSavedSegments);
+  const handleReceiveCoordinates = useCallback(
+    (data: string) => {
+      if (data === "finished") {
+        setAllCoordinatesReceived(true);
+        finalizeCave();
+        return;
+      }
 
-  const handleReceiveCoordinates = useCallback((data: string) => {
-    if (data === "finished") {
-      setAllCoordinatesReceived(true);
-      return;
-    }
-
-    const [leftWall, rightWall] = data.split(",").map(Number);
-    setCaveSegments((prev) => [...prev, { leftWall, rightWall }]);
-  }, []);
+      const [leftWall, rightWall] = data.split(",").map(Number);
+      addSegment({ leftWall, rightWall });
+    },
+    [addSegment, finalizeCave]
+  );
 
   useWebSocket(playerId, token, handleReceiveCoordinates);
 
@@ -57,12 +57,6 @@ const GamePage = () => {
     setIsDrawerOpen(false);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      setCaveSegmentsStore(caveSegments);
-    };
-  }, [caveSegments, setCaveSegmentsStore]);
-
   return (
     <div className="relative min-h-screen">
       {!allCoordinatesReceived && (
@@ -77,7 +71,7 @@ const GamePage = () => {
         <div>
           <GameDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} />
           <Cave
-            segments={caveSegments}
+            segments={cave}
             allCoordinatesReceived={allCoordinatesReceived}
             isDrawerOpen={isDrawerOpen}
             complexity={complexity}

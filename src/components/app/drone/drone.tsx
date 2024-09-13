@@ -1,5 +1,5 @@
 import { DRONE_HORIZONTAL_SPEED, SEGMENT_HEIGHT } from "@/lib/game-settings";
-import { usePlayerStore } from "@/store/player-store";
+import { useGameStore } from "@/store/game-store";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -22,8 +22,8 @@ const Drone: React.FC<DroneProps> = ({
   const canvasWidth = 500;
   const keysPressed = useRef<{ [key: string]: boolean }>({});
 
-  const isGameOver = usePlayerStore((state) => state.isGameOver);
-  const setGameOver = usePlayerStore((state) => state.setGameOver);
+  const isGameOver = useGameStore((state) => state.isGameOver);
+  const setGameOver = useGameStore((state) => state.setGameOver);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

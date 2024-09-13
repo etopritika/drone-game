@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Drone from "../drone/drone";
 import Score from "../score/score";
-import { usePlayerStore } from "@/store/player-store";
 import {
   CAVE_MAX_SPEED,
   CAVE_MIN_SPEED,
@@ -9,6 +8,7 @@ import {
   CAVE_SPEED_MULTIPLIER,
   SEGMENT_HEIGHT,
 } from "@/lib/game-settings";
+import { useGameStore } from "@/store/game-store";
 
 interface CaveProps {
   segments: { leftWall: number; rightWall: number }[];
@@ -28,7 +28,7 @@ const Cave: React.FC<CaveProps> = ({
   const [verticalSpeed, setVerticalSpeed] = useState(CAVE_SPEED);
   const canvasHeight = segments.length * SEGMENT_HEIGHT;
 
-  const isGameOver = usePlayerStore((state) => state.isGameOver);
+  const isGameOver = useGameStore((state) => state.isGameOver);
 
   const handleSpeedUp = useCallback(() => {
     setVerticalSpeed((prev) =>

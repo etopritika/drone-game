@@ -1,4 +1,4 @@
-import { usePlayerStore } from "@/store/player-store";
+import { useGameStore } from "@/store/game-store";
 import React, { useEffect, useState } from "react";
 
 interface ScoreProps {
@@ -14,8 +14,8 @@ const Score: React.FC<ScoreProps> = ({
 }) => {
   const [score, setScore] = useState(0);
 
-  const isGameOver = usePlayerStore((state) => state.isGameOver);
-  const saveScore = usePlayerStore((state) => state.setScore);
+  const isGameOver = useGameStore((state) => state.isGameOver);
+  const saveScore = useGameStore((state) => state.setScore);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
