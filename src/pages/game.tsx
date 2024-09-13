@@ -33,7 +33,7 @@ const GamePage = () => {
     [addSegment, finalizeCave]
   );
 
-  useWebSocket(playerId, token, handleReceiveCoordinates);
+  useWebSocket(!hasCave, playerId, token, handleReceiveCoordinates);
 
   const handleShowDrawer = useCallback((event: KeyboardEvent) => {
     if (event.key === "Escape") {

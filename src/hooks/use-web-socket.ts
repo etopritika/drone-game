@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
 export const useWebSocket = (
+  shouldConnect: boolean,
   playerId: string | null,
   token: string | null,
   onMessage: (data: string) => void
 ) => {
   useEffect(() => {
-    if (!playerId || !token) {
-      console.error("Player ID or token missing");
+    if (!shouldConnect || !playerId || !token) {
       return;
     }
 
@@ -40,5 +40,5 @@ export const useWebSocket = (
     return () => {
       socket.close();
     };
-  }, [playerId, token, onMessage]);
+  }, [shouldConnect, playerId, token, onMessage]);
 };
