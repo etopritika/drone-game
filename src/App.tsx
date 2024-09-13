@@ -6,7 +6,7 @@ import { Toaster } from "./components/ui/toaster";
 
 const StartGamePage = lazy(() => import("./pages/start-game"));
 const GamePage = lazy(() => import("./pages/game"));
-const FinishGamePage = lazy(() => import("./pages/finish-game"));
+const FinishGamePage = lazy(() => import("./pages/finish-game/finish-game"));
 
 const App: FC = (): JSX.Element => {
   return (

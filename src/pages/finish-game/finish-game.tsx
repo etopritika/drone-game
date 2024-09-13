@@ -1,5 +1,5 @@
 import { usePlayerStore } from "@/store/player-store";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 import TopScore from "@/components/app/top-score/top-score";
 import { useGameStore } from "@/store/game-store";
 import { useCaveStore } from "@/store/cave-store";
+import { updatePlayerScore } from "./actions";
 
 const FinishGame = () => {
   const name = usePlayerStore((state) => state.name);
@@ -23,36 +24,22 @@ const FinishGame = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedPlayers = localStorage.getItem("players");
-    const players = storedPlayers ? JSON.parse(storedPlayers) : [];
-
-    const playerIndex = players.findIndex(
-      (player: { name: string; complexity: number; topScore: number }) =>
-        player.name === name
-    );
-
-    if (playerIndex !== -1) {
-      const currentTopScore = players[playerIndex].topScore;
-
-      if (score > currentTopScore) {
-        players[playerIndex].topScore = score;
-        players[playerIndex].complexity = complexity;
-        localStorage.setItem("players", JSON.stringify(players));
-      }
+    if (name) {
+      updatePlayerScore(name, complexity, score);
     }
-  }, [name, score, complexity]);
+  }, [name, complexity, score]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setGameOver(false);
     navigate("/game");
-  };
+  }, [navigate, setGameOver]);
 
-  const handleExit = () => {
+  const handleExit = useCallback(() => {
     setGameOver(false);
     clearSegments();
     clearCave();
     navigate("/start-game");
-  };
+  }, [navigate, setGameOver, clearSegments, clearCave]);
 
   return (
     <div className="flex flex-col gap-12">
