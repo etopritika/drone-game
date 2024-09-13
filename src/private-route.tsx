@@ -5,7 +5,8 @@ import { usePlayerStore } from "@/store/player-store";
 export const PrivateRoute: FC = () => {
   const playerId = usePlayerStore((state) => state.playerId);
   const chunks = usePlayerStore((state) => state.chunks);
-  const token = chunks;
 
-  return playerId && token ? <Outlet /> : <Navigate to="/start-game" />;
+  const isAuthenticated = playerId && chunks;
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/start-game" replace />;
 };

@@ -13,18 +13,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import { getTokenChunk, initGame } from "./actions";
+import {
+  getLastPlayer,
+  getTokenChunk,
+  initGame,
+  savePlayerToLocalStorage,
+} from "./actions";
 import { usePlayerStore } from "@/store/player-store";
 import { useNavigate } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
-
-const StartGameSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  complexity: z
-    .number()
-    .min(1)
-    .max(10, { message: "Difficulty must be between 1 and 10" }),
-});
+import { StartGameSchema } from "./actions/schema";
 
 const StartGameForm = () => {
   const { toast } = useToast();
@@ -37,14 +35,6 @@ const StartGameForm = () => {
   const setComplexity = usePlayerStore((state) => state.setComplexity);
   const addChunk = usePlayerStore((state) => state.addChunk);
 
-  const getLastPlayer = () => {
-    const storedPlayers = localStorage.getItem("players");
-    const players = storedPlayers ? JSON.parse(storedPlayers) : [];
-    return players.length > 0
-      ? players[players.length - 1]
-      : { name: "", complexity: 1 };
-  };
-
   const lastPlayer = getLastPlayer();
 
   const form = useForm<z.infer<typeof StartGameSchema>>({
@@ -54,29 +44,6 @@ const StartGameForm = () => {
       complexity: lastPlayer.complexity || 1,
     },
   });
-
-  const savePlayerToLocalStorage = (name: string) => {
-    const storedPlayers = localStorage.getItem("players");
-    const players = storedPlayers ? JSON.parse(storedPlayers) : [];
-
-    const playerIndex = players.findIndex(
-      (player: { name: string }) => player.name === name
-    );
-
-    const newPlayerData = {
-      name: name,
-      complexity: 0,
-      topScore: 0,
-    };
-
-    if (playerIndex !== -1) {
-      players[playerIndex] = { ...players[playerIndex] };
-    } else {
-      players.push(newPlayerData);
-    }
-
-    localStorage.setItem("players", JSON.stringify(players));
-  };
 
   const onSubmit: SubmitHandler<z.infer<typeof StartGameSchema>> = async (
     data

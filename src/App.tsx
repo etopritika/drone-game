@@ -12,14 +12,12 @@ const App: FC = (): JSX.Element => {
   return (
     <Suspense fallback={<div>Loading page...</div>}>
       <Routes>
+        <Route path="/" element={<Navigate to="/start-game" replace />} />
         <Route path="/start-game" element={<StartGamePage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/game" element={<GamePage />} />
-        </Route>
-        <Route element={<PrivateRoute />}>
           <Route path="/finish-game" element={<FinishGamePage />} />
         </Route>
-        <Route path="/" element={<Navigate to="/start-game" replace />} />
       </Routes>
       <Toaster />
     </Suspense>

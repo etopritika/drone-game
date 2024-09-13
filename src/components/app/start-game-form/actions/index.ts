@@ -45,3 +45,34 @@ export const getTokenChunk = async (id: string | null, chunkNo: number) => {
   const result = await response.json();
   return result;
 };
+
+export const getLastPlayer = () => {
+  const storedPlayers = localStorage.getItem("players");
+  const players = storedPlayers ? JSON.parse(storedPlayers) : [];
+  return players.length > 0
+    ? players[players.length - 1]
+    : { name: "", complexity: 1 };
+};
+
+export const savePlayerToLocalStorage = (name: string) => {
+  const storedPlayers = localStorage.getItem("players");
+  const players = storedPlayers ? JSON.parse(storedPlayers) : [];
+
+  const playerIndex = players.findIndex(
+    (player: { name: string }) => player.name === name
+  );
+
+  const newPlayerData = {
+    name,
+    complexity: 0,
+    topScore: 0,
+  };
+
+  if (playerIndex !== -1) {
+    players[playerIndex] = { ...players[playerIndex] };
+  } else {
+    players.push(newPlayerData);
+  }
+
+  localStorage.setItem("players", JSON.stringify(players));
+};

@@ -9,7 +9,7 @@ import {
 
 const StartGame = () => {
   return (
-    <Card className="max-w-[400px] w-full">
+    <Card className="max-w-md w-full">
       <CardHeader>
         <CardTitle>Drone Game</CardTitle>
         <CardDescription>
