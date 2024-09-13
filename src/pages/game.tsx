@@ -12,15 +12,16 @@ const GamePage = () => {
   const token = chunks;
   const savedCaveSegments = usePlayerStore((state) => state.caveSegments);
   const setCaveSegmentsStore = usePlayerStore((state) => state.setCaveSegments);
+  const hasSavedSegments = savedCaveSegments.length > 0;
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   const [caveSegments, setCaveSegments] = useState<
     { leftWall: number; rightWall: number }[]
-  >(savedCaveSegments || []);
-  const [allCoordinatesReceived, setAllCoordinatesReceived] = useState(
-    !!savedCaveSegments.length
-  );
+  >(() => savedCaveSegments || []);
+
+  const [allCoordinatesReceived, setAllCoordinatesReceived] =
+    useState(hasSavedSegments);
 
   const handleReceiveCoordinates = useCallback((data: string) => {
     if (data === "finished") {
