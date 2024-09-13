@@ -11,27 +11,18 @@ const CaveLoadingProgress: React.FC<CaveLoadingProgressProps> = ({
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (!allCoordinatesReceived) {
-      interval = setInterval(() => {
-        setProgress((prevProgress) => {
-          if (prevProgress >= 100) {
-            return 0;
-          }
-          return prevProgress + 1;
-        });
-      }, 40);
-    }
-
     if (allCoordinatesReceived) {
-      clearInterval(interval!);
       setProgress(100);
+      return;
     }
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    const interval = setInterval(() => {
+      setProgress((prevProgress) =>
+        prevProgress >= 100 ? 0 : prevProgress + 1
+      );
+    }, 40);
+
+    return () => clearInterval(interval);
   }, [allCoordinatesReceived]);
 
   return (

@@ -18,19 +18,14 @@ const Score: React.FC<ScoreProps> = ({
   const saveScore = useGameStore((state) => state.setScore);
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+    if (isDrawerOpen || isGameOver) return;
 
-    if (!isDrawerOpen && !isGameOver) {
-      intervalId = setInterval(() => {
-        setScore(
-          (prevScore) => prevScore + Math.floor(complexity * verticalSpeed)
-        );
-      }, 100);
-    }
+    const scoreIncrement = Math.floor(complexity * verticalSpeed);
+    const intervalId = setInterval(() => {
+      setScore((prevScore) => prevScore + scoreIncrement);
+    }, 100);
 
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
+    return () => clearInterval(intervalId);
   }, [complexity, verticalSpeed, isDrawerOpen, isGameOver]);
 
   useEffect(() => {
