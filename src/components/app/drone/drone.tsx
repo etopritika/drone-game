@@ -98,8 +98,13 @@ const Drone: React.FC<DroneProps> = ({
 
   return (
     <div
-      className="fixed top-0 bg-green-500 w-6 h-6 z-50"
+      className="fixed top-0 z-50"
       style={{
+        width: 0,
+        height: 0,
+        borderLeft: "10px solid transparent",
+        borderRight: "10px solid transparent",
+        borderTop: "20px solid green",
         transform: `translateX(${droneX}px)`,
         opacity: droneOpacity,
         transition: "opacity 2s ease",
