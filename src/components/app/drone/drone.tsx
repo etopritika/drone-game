@@ -79,7 +79,7 @@ const Drone: React.FC<DroneProps> = ({
       setDroneOpacity(0);
       setTimeout(() => {
         navigate("/finish-game");
-      }, 2000);
+      }, 1000);
       return;
     }
 
@@ -92,7 +92,7 @@ const Drone: React.FC<DroneProps> = ({
       setDroneOpacity(0);
       setTimeout(() => {
         navigate("/finish-game");
-      }, 2000);
+      }, 1000);
     }
   }, [droneX, caveOffsetY, segments, setGameOver, navigate]);
 
@@ -107,7 +107,7 @@ const Drone: React.FC<DroneProps> = ({
         borderTop: "20px solid green",
         transform: `translateX(${droneX}px)`,
         opacity: droneOpacity,
-        transition: "opacity 2s ease",
+        transition: "opacity 1s ease",
       }}
     />
   );
