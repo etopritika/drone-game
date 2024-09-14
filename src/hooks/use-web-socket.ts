@@ -11,7 +11,7 @@ export const useWebSocket = (
       return;
     }
 
-    const socket = new WebSocket(`${import.meta.env.VITE_BACKEND_URL}/cave`);
+    const socket = new WebSocket(`${import.meta.env.VITE_SOCKET_URL}`);
 
     socket.onopen = function () {
       const playerMessage = `player:${playerId}-${token}`;
