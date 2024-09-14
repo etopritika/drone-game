@@ -1,5 +1,5 @@
 import { usePlayerStore } from "@/store/player-store";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
 import TopScore from "@/components/app/top-score/top-score";
 import { useGameStore } from "@/store/game-store";
 import { useCaveStore } from "@/store/cave-store";
-import { updatePlayerScore } from "./actions";
+import { getTopPlayerByName, updatePlayerScore } from "./actions";
 
 const FinishGame = () => {
   const name = usePlayerStore((state) => state.name);
@@ -23,9 +23,16 @@ const FinishGame = () => {
   const clearCave = useCaveStore((state) => state.clearCave);
   const navigate = useNavigate();
 
+  const [topPlayer, setTopPlayer] = useState<{
+    name: string;
+    topScore: number;
+    complexity: number;
+  } | null>(null);
+
   useEffect(() => {
     if (name) {
       updatePlayerScore(name, complexity, score);
+      setTopPlayer(getTopPlayerByName(name));
     }
   }, [name, complexity, score]);
 
@@ -43,7 +50,7 @@ const FinishGame = () => {
 
   return (
     <div className="flex flex-col gap-12">
-      <TopScore />
+      <TopScore topPlayer={topPlayer} />
       <Card className="min-w-[300px]">
         <CardHeader>
           <CardTitle>Game Over!</CardTitle>
