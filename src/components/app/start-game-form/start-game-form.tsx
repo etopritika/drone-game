@@ -36,7 +36,7 @@ const StartGameForm = () => {
   const addChunk = usePlayerStore((state) => state.addChunk);
 
   const lastPlayer = getLastPlayer();
-
+  console.log("lastPlayer:", lastPlayer);
   const form = useForm<z.infer<typeof StartGameSchema>>({
     resolver: zodResolver(StartGameSchema),
     defaultValues: {
@@ -85,6 +85,15 @@ const StartGameForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetPlayer = () => {
+    localStorage.removeItem("players");
+
+    form.reset({
+      name: "",
+      complexity: 1,
+    });
   };
 
   return (
@@ -148,9 +157,10 @@ const StartGameForm = () => {
             {loading ? <LoaderCircle className="animate-spin" /> : "Lets role!"}
           </Button>
           <Button
+            type="button"
             variant="outline"
             disabled={loading}
-            onClick={() => form.reset()}
+            onClick={resetPlayer}
           >
             Reset
           </Button>
