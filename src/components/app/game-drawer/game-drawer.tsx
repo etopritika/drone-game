@@ -32,25 +32,27 @@ const GameDrawer: React.FC<GameDrawerProps> = ({ isOpen, onClose }) => {
         <div className="p-4 flex flex-col justify-center items-center">
           <p className="mt-4 text-lg font-semibold">Controls</p>
           <div className="flex items-center mt-4 gap-6">
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-2 mb-2">
-                <SquareArrowDown />
-                <span className="text-sm">Increase drone speed</span>
-              </div>
-              <div className="flex items-center space-x-2 mb-2">
-                <SquareArrowUp />
+            <div className="min-w-[340px] flex items-center flex-col">
+              <div className="flex flex-col items-center relative space-y-1">
                 <span className="text-sm">Decrease drone speed</span>
+                <div className="w-[1px] h-3 bg-white/80" />
+                <SquareArrowUp />
               </div>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-2 mb-2">
-                <SquareArrowLeft />
-                <span className="text-sm">Move drone left</span>
+              <div className="flex items-center space-x-1 w-full">
+                <span className="text-sm min-w-[113px] text-right">
+                  Move drone left
+                </span>
+                <div className="w-3 h-[1px] bg-white/80" />
+                <div className="flex">
+                  <SquareArrowLeft />
+                  <SquareArrowDown />
+                  <SquareArrowRight />
+                </div>
+                <div className="w-3 h-[1px] bg-white/80" />
+                <span className="text-sm min-w-[113px]">Move drone right</span>
               </div>
-              <div className="flex items-center space-x-2 mb-2">
-                <SquareArrowRight />
-                <span className="text-sm">Move drone right</span>
-              </div>
+              <div className="w-[1px] h-3 bg-white/80 my-[1px]" />
+              <span className="text-sm">Increase drone speed</span>
             </div>
           </div>
         </div>
