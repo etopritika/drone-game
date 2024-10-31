@@ -17,16 +17,17 @@ const Score: React.FC<ScoreProps> = ({
   const isGameOver = useGameStore((state) => state.isGameOver);
   const saveScore = useGameStore((state) => state.setScore);
 
+  const scoreIncrement = Math.floor(complexity * verticalSpeed);
+
   useEffect(() => {
     if (isDrawerOpen || isGameOver) return;
 
-    const scoreIncrement = Math.floor(complexity * verticalSpeed);
     const intervalId = setInterval(() => {
       setScore((prevScore) => prevScore + scoreIncrement);
     }, 100);
 
     return () => clearInterval(intervalId);
-  }, [complexity, verticalSpeed, isDrawerOpen, isGameOver]);
+  }, [scoreIncrement, isDrawerOpen, isGameOver]);
 
   useEffect(() => {
     if (isGameOver) {

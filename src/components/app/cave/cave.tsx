@@ -46,10 +46,10 @@ const Cave: React.FC<CaveProps> = ({
     let animationFrameId: number;
 
     const animate = () => {
-      if (!isGameOver) {
-        setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
-        animationFrameId = requestAnimationFrame(animate);
-      }
+      if (isGameOver) return;
+
+      setCaveOffsetY((prevOffsetY) => prevOffsetY + verticalSpeed);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     if (allCoordinatesReceived && !isDrawerOpen && !isGameOver) {
@@ -67,14 +67,17 @@ const Cave: React.FC<CaveProps> = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#242424";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.lineWidth = 2;
+
     let lastLeftX = 250 + (segments[0]?.leftWall ?? -71);
     let lastRightX = 250 + (segments[0]?.rightWall ?? 71);
     let lastY = 0;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#242424";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     segments.forEach(({ leftWall, rightWall }) => {
       const currentY = lastY + SEGMENT_HEIGHT;
@@ -86,11 +89,7 @@ const Cave: React.FC<CaveProps> = ({
       ctx.lineTo(lastRightX, lastY);
       ctx.closePath();
 
-      ctx.fillStyle = "#FFFFFF";
       ctx.fill();
-
-      ctx.strokeStyle = "#FFFFFF";
-      ctx.lineWidth = 2;
       ctx.stroke();
 
       lastLeftX = 250 + leftWall;

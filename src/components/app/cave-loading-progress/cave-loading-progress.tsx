@@ -22,16 +22,16 @@ const CaveLoadingProgress: React.FC<CaveLoadingProgressProps> = ({
       setProgress((prevProgress) =>
         prevProgress >= 100 ? 0 : prevProgress + 1
       );
-    }, 40);
+    }, 50);
 
     return () => clearInterval(interval);
   }, [allCoordinatesReceived]);
 
   useEffect(() => {
-    if (progress === 100) {
+    if (progress === 100 && !allCoordinatesReceived) {
       setMessageIndex((prevIndex) => (prevIndex + 1) % loadingMessages.length);
     }
-  }, [progress]);
+  }, [progress, allCoordinatesReceived]);
 
   return (
     <div className="w-full sm:w-96 max-w-md my-4">
