@@ -36,7 +36,7 @@ const StartGameForm = () => {
   const addChunk = usePlayerStore((state) => state.addChunk);
 
   const lastPlayer = getLastPlayer();
-  console.log("lastPlayer:", lastPlayer);
+
   const form = useForm<z.infer<typeof StartGameSchema>>({
     resolver: zodResolver(StartGameSchema),
     defaultValues: {
