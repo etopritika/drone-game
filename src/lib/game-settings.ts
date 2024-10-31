@@ -8,4 +8,4 @@ export const CAVE_MAX_SPEED = 50;
 
 export const SEGMENT_HEIGHT = 20;
 
-export const DRONE_HORIZONTAL_SPEED = 5;
+export const DRONE_HORIZONTAL_SPEED = 3;
