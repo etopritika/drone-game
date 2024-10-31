@@ -26,20 +26,14 @@ const Drone: React.FC<DroneProps> = ({
 
   const handleKey = useCallback(
     (event: KeyboardEvent) => {
+      if (isGameOver) return;
       const isKeyDown = event.type === "keydown";
-      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-        keysPressed.current[event.key] = isKeyDown;
-      }
+      keysPressed.current[event.key] = isKeyDown;
 
-      if (event.key === "ArrowDown" && isKeyDown) {
-        handleSpeedUp();
-      }
-
-      if (event.key === "ArrowUp" && isKeyDown) {
-        handleSpeedDown();
-      }
+      if (event.key === "ArrowDown" && isKeyDown) handleSpeedUp();
+      if (event.key === "ArrowUp" && isKeyDown) handleSpeedDown();
     },
-    [handleSpeedUp, handleSpeedDown]
+    [handleSpeedUp, handleSpeedDown, isGameOver]
   );
 
   useEffect(() => {
@@ -60,40 +54,45 @@ const Drone: React.FC<DroneProps> = ({
       requestAnimationFrame(moveDrone);
     };
 
-    requestAnimationFrame(moveDrone);
-
+    const animationFrame = requestAnimationFrame(moveDrone);
     window.addEventListener("keydown", handleKey);
     window.addEventListener("keyup", handleKey);
 
     return () => {
+      cancelAnimationFrame(animationFrame);
       window.removeEventListener("keydown", handleKey);
       window.removeEventListener("keyup", handleKey);
+      keysPressed.current = {};
     };
   }, [handleKey, isGameOver]);
 
   useEffect(() => {
-    const currentSegmentIndex = Math.floor(caveOffsetY / SEGMENT_HEIGHT);
+    const checkGameOver = () => {
+      const currentSegmentIndex = Math.floor(caveOffsetY / SEGMENT_HEIGHT);
 
-    if (currentSegmentIndex >= segments.length) {
-      setGameOver(true);
-      setDroneOpacity(0);
-      setTimeout(() => {
-        navigate("/finish-game");
-      }, 1000);
-      return;
-    }
+      if (currentSegmentIndex >= segments.length) {
+        setGameOver(true);
+        setDroneOpacity(0);
+        setTimeout(() => {
+          navigate("/finish-game");
+        }, 1000);
+        return;
+      }
 
-    const { leftWall, rightWall } = segments[currentSegmentIndex] || {};
-    const leftWallX = 250 + (leftWall ?? -71);
-    const rightWallX = 250 + (rightWall ?? 71);
+      const { leftWall, rightWall } = segments[currentSegmentIndex] || {};
+      const leftWallX = 250 + (leftWall ?? -71);
+      const rightWallX = 250 + (rightWall ?? 71);
 
-    if (droneX < leftWallX || droneX > rightWallX) {
-      setGameOver(true);
-      setDroneOpacity(0);
-      setTimeout(() => {
-        navigate("/finish-game");
-      }, 1000);
-    }
+      if (droneX < leftWallX || droneX > rightWallX) {
+        setGameOver(true);
+        setDroneOpacity(0);
+        setTimeout(() => {
+          navigate("/finish-game");
+        }, 1000);
+      }
+    };
+
+    checkGameOver();
   }, [droneX, caveOffsetY, segments, setGameOver, navigate]);
 
   return (
