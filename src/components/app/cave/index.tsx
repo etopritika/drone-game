@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Drone from "../drone/drone";
-import Score from "../score/score";
+import Drone from "../drone";
+import Score from "../score";
 import {
   CAVE_MAX_SPEED,
   CAVE_MIN_SPEED,

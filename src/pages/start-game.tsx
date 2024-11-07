@@ -1,4 +1,4 @@
-import StartGameForm from "@/components/app/start-game-form/start-game-form";
+import StartGameForm from "@/components/app/start-game-form";
 import {
   Card,
   CardContent,

@@ -1,6 +1,6 @@
-import CaveLoadingProgress from "@/components/app/cave-loading-progress/cave-loading-progress";
-import Cave from "@/components/app/cave/cave";
-import GameDrawer from "@/components/app/game-drawer/game-drawer";
+import CaveLoadingProgress from "@/components/app/cave-loading-progress";
+import Cave from "@/components/app/cave";
+import GameDrawer from "@/components/app/game-drawer";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocket } from "@/hooks/use-web-socket";
 import { useCaveStore } from "@/store/cave-store";

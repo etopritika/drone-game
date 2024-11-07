@@ -9,7 +9,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import TopScore from "@/components/app/top-score/top-score";
+import TopScore from "@/components/app/top-score";
 import { useGameStore } from "@/store/game-store";
 import { useCaveStore } from "@/store/cave-store";
 import { getTopPlayerByName, updatePlayerScore } from "./actions";
